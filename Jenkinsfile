@@ -8,9 +8,23 @@ pipeline {
 
             steps {
 
-                echo 'Downloading source code from GitHub...'
+                echo "Downloading Source Code"
 
                 checkout scm
+
+            }
+
+        }
+
+        stage('Build Docker Image') {
+
+            steps {
+
+                dir('app') {
+
+                    sh 'docker build -t simple-web:v1 .'
+
+                }
 
             }
 
