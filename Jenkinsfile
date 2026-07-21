@@ -76,6 +76,18 @@ pipeline {
                             kubectl apply -f svc.yaml
 
                             kubectl rollout status deployment/simple-web
+
+                            echo "========== Nodes =========="
+                            kubectl get nodes
+
+                            echo "========== Deployments =========="
+                            kubectl get deployments
+
+                            echo "========== Pods =========="
+                            kubectl get pods -o wide
+
+                            echo "========== Services =========="
+                            kubectl get svc
                         """
                     }
                 }
