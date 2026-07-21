@@ -60,26 +60,26 @@ pipeline {
             }
         }
         stage('Deploy to EKS') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws_access_key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws_secret_access_key', variable: 'AWS_SECRET_ACCESS_KEY'),
+                    file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')
+                ]) {
 
-        steps {
+                    dir('k8s') {
 
-            withCredentials([
-                file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')
-            ]) {
+                        sh """
+                            sed -i 's|IMAGE_PLACEHOLDER|${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml
 
-                dir('Kubernutes') {
+                            kubectl apply -f deployment.yaml
+                            kubectl apply -f service.yaml
 
-                    sh '''
-                    kubectl apply -f deployment.yaml
-                    kubectl apply -f svc.yaml
-                    '''
-
+                            kubectl rollout status deployment/simple-web
+                        """
+                    }
                 }
-
             }
-
         }
-
-    }
     }
 }
