@@ -3,12 +3,10 @@ pipeline {
     agent any
 
     environment {
-
-        AWS_REGION = 'us-east-1'
+        AWS_REGION  = 'us-east-1'
         AWS_ACCOUNT = '529088275092'
-        IMAGE_NAME = 'ecr1'
-        IMAGE_TAG = "${BUILD_NUMBER}"
-
+        IMAGE_NAME  = 'ecr1'
+        IMAGE_TAG   = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -31,17 +29,21 @@ pipeline {
 
         stage('Login to ECR') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'Github_cred'
-                ]]) {
-                    sh """
-                        aws ecr get-login-password \
-                        --region ${AWS_REGION} | docker login \
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+
+                    sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                        aws ecr get-login-password --region us-east-1 | \
+                        docker login \
                         --username AWS \
                         --password-stdin \
-                        ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                    """
+                        529088275092.dkr.ecr.us-east-1.amazonaws.com
+                    '''
                 }
             }
         }
@@ -57,6 +59,5 @@ pipeline {
                 """
             }
         }
-
     }
 }
