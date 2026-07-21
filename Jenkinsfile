@@ -67,13 +67,13 @@ pipeline {
                     file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')
                 ]) {
 
-                    dir('k8s') {
+                    dir('Kubernutes') {
 
                         sh """
                             sed -i 's|IMAGE_PLACEHOLDER|${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml
 
                             kubectl apply -f deployment.yaml
-                            kubectl apply -f service.yaml
+                            kubectl apply -f svc.yaml
 
                             kubectl rollout status deployment/simple-web
                         """
