@@ -59,5 +59,27 @@ pipeline {
                 """
             }
         }
+        stage('Deploy to EKS') {
+
+        steps {
+
+            withCredentials([
+                file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')
+            ]) {
+
+                dir('Kubernutes') {
+
+                    sh '''
+                    kubectl apply -f deployment.yaml
+                    kubectl apply -f service.yaml
+                    '''
+
+                }
+
+            }
+
+        }
+
+    }
     }
 }
